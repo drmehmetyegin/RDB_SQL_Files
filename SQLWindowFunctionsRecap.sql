@@ -83,3 +83,36 @@ from(
 
 --///////////////////////////////
 --QUESTION: Write a query that returns how many products are in each order?
+
+SELECT *
+FROM sale.order_item
+
+SELECT DISTINCT order_id, SUM(quantity) OVER(PARTITION BY order_id) num_product
+FROM sale.order_item
+
+--///////////////////////////////
+--QUESTION: Write a query that returns the number of products in each category of brands.
+--(her bir markan�n farkl� kategorilerdeki �r�n say�lar�)
+
+SELECT DISTINCT pp.brand_id pp.category_id, COUNT(pp.brand_id) OVER(PARTITION BY pp.brand_id, pp.category_id)
+FROM sale.order_item oi 
+INNER JOIN product.product pp ON pp.product_id=oi.product_id
+
+-------------------------------------------------------------------------
+--WINDOW FRAMES
+-------------------------------------------------------------------------
+-------partition by sifirlama yapar order by toplayarak devam eder. 3. satirda 13 21 33 41 olarak gidiyor
+select brand_id, model_year,
+	count(product_id) over(),
+	count(product_id) over(partition by brand_id),
+	count(product_id) over(partition by brand_id order by model_year)
+from product.product
+---------------Unbounded preceding ve unbounded following partition by ile gruplanan itemlarin basi ve sonu. Bir sonraki brand_id de bastan baslar
+select brand_id, model_year,
+	count(product_id) over(partition by brand_id order by model_year),
+	count(product_id) over(partition by brand_id order by model_year range between unbounded preceding and current row) [range], --default
+	count(product_id) over(partition by brand_id order by model_year rows between unbounded preceding and current row) [row],
+	count(product_id) over(partition by brand_id order by model_year rows between 1 preceding and current row) [row_1_preceding],
+	count(product_id) over(partition by brand_id order by model_year rows between unbounded preceding and unbounded following) [row_un],
+	count(product_id) over(partition by brand_id order by model_year range between unbounded preceding and unbounded following) [range_un]
+from product.product
