@@ -116,3 +116,27 @@ select brand_id, model_year,
 	count(product_id) over(partition by brand_id order by model_year rows between unbounded preceding and unbounded following) [row_un],
 	count(product_id) over(partition by brand_id order by model_year range between unbounded preceding and unbounded following) [range_un]
 from product.product
+
+select brand_id, model_year,
+	count(product_id) over(partition by brand_id order by model_year),
+    count(product_id) over(partition by brand_id order by model_year rows between unbounded preceding and 1 following) [Row23],
+    count(product_id) over(partition by brand_id order by model_year range between current row and unbounded following) [Row44],
+    count(product_id) over(partition by brand_id order by model_year range between current row and unbounded following) [range_11]
+from product.product
+
+
+-------------------------------------------------------------------------
+--2. ANALYTIC NAVIGATION FUNCTIONS
+-------------------------------------------------------------------------
+
+--It's mandatory to use ORDER BY.
+
+--******FIRST_VALUE()*****--
+--/////////////////////////////////
+
+
+select *, first_value(first_name) over(order by first_name) 
+from sale.staff
+
+select *, first_value(first_name) over(order by last_name) 
+from sale.staff
