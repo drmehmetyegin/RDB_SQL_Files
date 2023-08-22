@@ -190,3 +190,36 @@ from cte
 
 
 --QUESTION: Write a query that returns last order date by month.
+SELECT DISTINCT YEAR(Order_date) OrderYear, Month(Order_date) OrderMonth, LAST_VALUE(order_date) Over(ORDER BY YEAR(Order_date), Month(Order_date)) last_order_date
+FROM sale.orders
+
+--******LAG() & LEAD()*****--
+
+
+--LAG() SYNTAX
+
+/*LAG(return_value ,offset [,default]) 
+OVER (
+    [PARTITION BY partition_expression, ... ]
+    ORDER BY sort_expression [ASC | DESC], ...
+)*/
+
+
+--QUESTION: Write a query that returns the order date of the one previous sale of each staff (use the LAG function)
+SELECT *
+FROM sale.staff a
+INNER JOIN sale.orders b ON a.staff_id=b.staff_id
+
+SELECT a.staff_id, (a.first_name + ' '+a.last_name) as fullname, b.order_date, LAG(b.order_date) OVER (Partition BY a.staff_id Order BY order_date) previous_sale
+FROM sale.staff a
+INNER JOIN sale.orders b ON a.staff_id=b.staff_id
+
+--LEAD() SYNTAX
+
+/*LEAD(return_value ,offset [,default]) 
+OVER (
+    [PARTITION BY partition_expression, ... ]
+    ORDER BY sort_expression [ASC | DESC], ...
+)*/
+
+--QUESTION: Write a query that returns the order date of the one next sale of each staff (use the LEAD function)
