@@ -140,3 +140,53 @@ from sale.staff
 
 select *, first_value(first_name) over(order by last_name) 
 from sale.staff
+
+--QUESTION: Write a query that returns first order date by month.
+SELECT*
+FROM sale.orders
+
+SELECT DISTINCT YEAR(Order_date) OrderYear, Month(Order_date) OrderMonth, FIRST_VALUE(order_date) Over(ORDER BY YEAR(Order_date), Month(Order_date)) first_order_date
+FROM sale.orders
+
+--QUESTION: Write a query that returns customers and their most valuable order with total amount of it.
+
+
+---SELECT k.customer_id, l.order_id, FIRST_VALUE(net_price) OVER (ORDER BY k.customer_id)
+---FROM (SELECT k.customer_id, l.order_id, SUM(m.list_price*m.quantity*(1-m.discount)) net_total_price
+----FROM sale.customer k  
+---INNER JOIN sale.orders l ON k.customer_id= l.customer_id
+---INNER JOIN sale.order_item m ON l.order_id=m.order_id
+---GROUP BY k.customer_id, l.order_id)t
+--ORDER BY k.customer_id, l.order_id) t
+
+WITH CTE AS (SELECT k.customer_id, l.order_id, SUM(m.list_price*m.quantity*(1-m.discount)) net_total_price
+FROM sale.customer k  
+INNER JOIN sale.orders l ON k.customer_id= l.customer_id
+INNER JOIN sale.order_item m ON l.order_id=m.order_id
+GROUP BY k.customer_id, l.order_id)
+SELECT distinct customer_id,
+	first_value(order_id) over(partition by customer_id order by net_price desc),
+	first_value(net_price) over(partition by customer_id order by net_price desc)
+from CTE
+
+---True only
+with cte as
+(
+		select a.customer_id, b.order_id,
+			SUM(quantity * list_price * (1-discount)) net_price
+		from sale.orders a
+			inner join sale.order_item b
+			on a.order_id=b.order_id
+		group by a.customer_id, b.order_id
+		
+)
+select distinct customer_id,
+	first_value(order_id) over(partition by customer_id order by net_price desc),
+	first_value(net_price) over(partition by customer_id order by net_price desc)
+from cte
+
+--/////////////////////////////////
+--******LAST_VALUE()*****--
+
+
+--QUESTION: Write a query that returns last order date by month.
