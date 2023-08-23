@@ -255,3 +255,45 @@ SELECT YEAR(order_date) order_year, MONTH(order_date) order_month, COUNT(order_i
 FROM sale.orders 
 GROUP BY YEAR(order_date), MONTH(order_date)
 ORDER BY YEAR(order_date), MONTH(order_date)
+
+--SQL SESSION-9, 25.01.2023, (Window Functions-2)
+
+--*** Windowed functions can only appear in the SELECT or ORDER BY clauses.
+
+--3. ANALYTIC NUMBERING FUNCTIONS--
+
+--ROW_NUMBER() - RANK() - DENSE_RANK() - CUME_DIST() - PERCENT_RANK() - NTILE()
+
+--The ORDER BY clause is mandatory because these functions are order sensitive.
+--They are not used with window frames.
+
+--////////////////////////
+
+--QUESTION: Assign an ordinal number to the product prices for each category in ascending order.
+
+SELECT
+	category_id, list_price,
+	ROW_NUMBER() OVER(PARTITION BY category_id ORDER BY list_price) row_num	
+FROM
+	product.product
+
+
+--Lets try previous query again using RANK() and DENSE_RANK() functions.
+SELECT
+	category_id, list_price,
+	ROW_NUMBER() OVER(PARTITION BY category_id ORDER BY list_price) row_num,
+	RANK() OVER(PARTITION BY category_id ORDER BY list_price) rank_num,
+	DENSE_RANK()OVER(PARTITION BY category_id ORDER BY list_price) drank_num,
+	PERCENT_RANK() OVER(PARTITION BY category_id ORDER BY list_price) perrank_num
+FROM
+	product.product
+
+
+
+SELECT
+	category_id, list_price,
+	ROW_NUMBER() OVER(PARTITION BY category_id ORDER BY list_price) row_num,
+	RANK() OVER(PARTITION BY category_id ORDER BY list_price) rnk,
+	DENSE_RANK() OVER(PARTITION BY category_id ORDER BY list_price) dense_rnk
+FROM
+	product.product
