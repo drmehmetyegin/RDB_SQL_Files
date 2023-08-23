@@ -223,3 +223,35 @@ OVER (
 )*/
 
 --QUESTION: Write a query that returns the order date of the one next sale of each staff (use the LEAD function)
+SELECT a.staff_id, (a.first_name + ' '+a.last_name) as fullname, b.order_date, LEAD (b.order_date) OVER (Partition BY a.staff_id Order BY order_date) next_sale
+FROM sale.staff a
+INNER JOIN sale.orders b ON a.staff_id=b.staff_id
+
+
+----------------------------------------------------------------------
+
+--QUESTION: Write a query that returns the difference order count between the current month and the previous month for each year. 
+
+WITH cte as (SELECT YEAR(a.order_date) order_year, MONTH(a.order_date) order_month, COUNT(a.order_id) order_count
+FROM sale.orders a 
+GROUP BY YEAR(a.order_date), MONTH(a.order_date))
+SELECT order_year, order_month, order_count, LAG(order_count) OVER (Order by order_month) as next_month, (order_count-LEAD(order_count) OVER (Order by order_month))as difference_order
+FROM cte
+
+
+with t1 as(
+	select distinct year(order_date) years, month(order_date) months,
+		count(order_id) over(partition by year(order_date), month(order_date)) total_orders
+	from sale.orders
+)
+select years, months, total_orders,
+	lag(total_orders) over(partition by years order by years, months) previous_month,
+	total_orders - lag(total_orders) over(partition by years order by years, months) 'difference'
+from t1
+
+
+
+SELECT YEAR(order_date) order_year, MONTH(order_date) order_month, COUNT(order_id) order_count
+FROM sale.orders 
+GROUP BY YEAR(order_date), MONTH(order_date)
+ORDER BY YEAR(order_date), MONTH(order_date)
