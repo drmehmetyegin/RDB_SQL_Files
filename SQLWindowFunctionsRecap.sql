@@ -305,10 +305,6 @@ FROM
 --QUESTION: Write a query that returns both of the followings:
 -- * Average product price.
 -- * The average product price of orders.
-WITH tr AS
-()
-SELECT *
-FROM tr
 
 
 SELECT DISTINCT order_id, 
@@ -316,4 +312,6 @@ SELECT DISTINCT order_id,
 		AVG((list_price*quantity*(1-discount))) OVER (PARTITION BY order_id) as avg_ord_price
 FROM sale.order_item
 
+--////////////////////////
 
+--QUESTION: Which orders' average product price is lower than the overall average price?
