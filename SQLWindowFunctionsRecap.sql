@@ -312,15 +312,4 @@ SELECT DISTINCT order_id,
 		AVG((list_price*quantity*(1-discount))) OVER (PARTITION BY order_id) as avg_ord_price
 FROM sale.order_item
 
---////////////////////////
 
---QUESTION: Which orders' average product price is lower than the overall average price?
-
-
-SELECT DISTINCT order_id, avg_pr_price, avg_ord_price
-FROM (SELECT order_id, 
-		AVG((list_price*quantity*(1-discount))) OVER () as avg_pr_price,
-		AVG((list_price*quantity*(1-discount))) OVER (PARTITION BY order_id) as avg_ord_price
-FROM sale.order_item
-) t
-WHERE avg_pr_price > avg_ord_price
