@@ -327,4 +327,9 @@ WHERE avg_pr_price > avg_ord_price
 ORDER BY avg_ord_price DESC
 
 
+--////////////////////////
 
+--QUESTION: Calculate the stores' weekly cumulative count of orders for 2018.
+
+SELECT *
+FROM Sale.orders
